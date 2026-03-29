@@ -27,17 +27,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/api/register")
-def register_user(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.email == form.username).first()
-    if user:
-        raise HTTPException(status_code=400, detail="Este e-mail já existe.")
+# @app.post("/api/register")
+# def register_user(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+#     user = db.query(models.User).filter(models.User.email == form.username).first()
+#     if user:
+#         raise HTTPException(status_code=400, detail="Este e-mail já existe.")
     
-    hashed_password = auth.get_password_hash(form.password)
-    new_user = models.User(email=form.username, hashed_password=hashed_password)
-    db.add(new_user)
-    db.commit()
-    return {"message": "Conta criada com sucesso!"}
+#     hashed_password = auth.get_password_hash(form.password)
+#     new_user = models.User(email=form.username, hashed_password=hashed_password)
+#     db.add(new_user)
+#     db.commit()
+#     return {"message": "Conta criada com sucesso!"}
 
 @app.post("/api/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
