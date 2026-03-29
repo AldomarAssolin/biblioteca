@@ -8,12 +8,13 @@ from database import engine, get_db, Base
 import models
 import auth
 
-# Inicia Banco de Dados na pasta dinamicamente
-Base.metadata.create_all(bind=engine)
-
-# Cria as pastas de persistência na VPS
+# Cria a pasta raiz física do banco primeiro (OBRIGATÓRIO PARA GIT LIMPO)
+import os
 UPLOADS_DIR = "uploads/books"
 os.makedirs(UPLOADS_DIR, exist_ok=True)
+
+# Depois que a pasta existe, Inicia o Banco de Dados gerando o arquivo dentro dela automaticamente
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Biblioteca API Digital")
 
