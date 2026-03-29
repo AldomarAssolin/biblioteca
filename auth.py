@@ -1,6 +1,6 @@
 import os
 from datetime import datetime, timedelta
-from passlib.context import CryptContext
+import bcrypt
 from jose import JWTError, jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -16,15 +16,15 @@ SECRET_KEY = os.getenv("SECRET_KEY", "chave_secreta_fallback_aqui")  # Puxando a
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 7 dias (Logado por uma semana)
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # O OAuth2 espera os dados vindos de FormData com os campos `username` e `password`
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
 
 def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
 def get_password_hash(password):
-    return pwd_context.hash(password)
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
 
 def create_access_token(data: dict):
     to_encode = data.copy()
