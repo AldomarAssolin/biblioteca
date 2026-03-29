@@ -16,6 +16,24 @@ os.makedirs(UPLOADS_DIR, exist_ok=True)
 # Depois que a pasta existe, Inicia o Banco de Dados gerando o arquivo dentro dela automaticamente
 Base.metadata.create_all(bind=engine)
 
+# Seeder de Administração: Se o banco estiver zerado, cria o primeiro usuário automaticamente
+def init_admin():
+    from database import SessionLocal
+    db = SessionLocal()
+    try:
+        if db.query(models.User).count() == 0:
+            default_email = os.getenv("ADMIN_EMAIL", "admin@oasis.com")
+            default_password = os.getenv("ADMIN_PASSWORD", "admin123")
+            hashed_pw = auth.get_password_hash(default_password)
+            db.add(models.User(email=default_email, hashed_password=hashed_pw))
+            db.commit()
+            print(f"Admin inicial criado com {default_email}")
+    except Exception as e:
+        print(f"Erro ao injetar Admin: {e}")
+    finally:
+        db.close()
+init_admin()
+
 app = FastAPI(title="Biblioteca API Digital")
 
 # Cors
