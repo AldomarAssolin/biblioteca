@@ -10,7 +10,6 @@ services:
     # caso você precise reiniciar o docker no futuro. O banco DB também se auto preservará.
     volumes:
       - ./uploads:/app/uploads
-      - ./library.db:/app/library.db
 
     labels:
       - "traefik.enable=true"
