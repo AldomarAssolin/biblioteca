@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  biblioteca:
+    build: .
+    container_name: biblioteca_app
+    restart: unless-stopped
+    
+    # É obrigatório que os volumes retenham os livros físicos salvos
+    # caso você precise reiniciar o docker no futuro. O banco DB também se auto preservará.
+    volumes:
+      - ./uploads:/app/uploads
+      - ./library.db:/app/library.db
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.biblioteca.rule=Host(`biblioteca.manexlabs.dev`)"
+      # O Traefik vai jogar qualquer requisição do navegador direto na barriga 8000 interna desse contêiner:
+      - "traefik.http.services.biblioteca.loadbalancer.server.port=8000"
+      
+      # (Opcional: Se seu traefik já cuida do HTTPS via Certbot/LetsEncrypt, ative a linha abaixo)
+      # - "traefik.http.routers.biblioteca.tls.certresolver=minha_resolver"
+      # - "traefik.http.routers.biblioteca.entrypoints=websecure"
+
+    # Lembre-se de colocar este aplicativo na mesma rede interna do Traefik da sua VPS.
+    # Exemplo: Se sua rede chama "proxy" ou "traefik", troque o nome aqui:
+    networks:
+      - web
+
+# Declarando a Rede do Traefik que já existe na sua VPS hoje.
+networks:
+  web:
+    external: true
